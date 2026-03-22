@@ -78,37 +78,107 @@ def _build_metrics() -> list:
     return [factual_grounding, relevance, completeness, cosine]
 
 
-def run_evaluation() -> dict[str, dict[str, float | None]]:
-    """
-    Run the full golden dataset through all metrics.
-    Returns: {test_id: {metric_name: score}}
-    """
-    records = load_golden_data()
-    metrics = _build_metrics()
-
-    test_cases = [
-        LLMTestCase(
-            name=record["id"],
-            input=record["input"],
-            actual_output=record["actual_output"],
-            expected_output=record["expected_output"],
-        )
-        for record in records
-    ]
-
-    result = deepeval.evaluate(
-        test_cases=test_cases,
-        metrics=metrics,
-        display_config=DisplayConfig(print_results=False, show_indicator=False),
-        cache_config=CacheConfig(write_cache=False, use_cache=False),
+def _build_confabulation_metrics() -> list:
+    data_grounding = GEval(
+        name="Data Grounding",
+        criteria="Evaluate whether the actual output stays grounded in the provided context and refuses to fabricate information about data that does not exist.",
+        evaluation_steps=[
+            "Check if the input asks about data, columns, tables, or metrics that do NOT exist according to the context.",
+            "If the context indicates the requested data does not exist, verify the actual output acknowledges this limitation rather than fabricating an answer.",
+            "Penalize any specific numbers, values, or data points that are not supported by the context.",
+            "Reward responses that clearly state what IS available in the data model when declining to answer.",
+            "Score 10 if the response correctly refuses and explains why, 5 if it partially refuses but includes some fabrication, 0 if it fabricates a full answer.",
+        ],
+        evaluation_params=[
+            LLMTestCaseParams.INPUT,
+            LLMTestCaseParams.ACTUAL_OUTPUT,
+            LLMTestCaseParams.CONTEXT,
+        ],
+        threshold=0.7,
     )
 
+    refusal_quality = GEval(
+        name="Refusal Quality",
+        criteria="Evaluate the quality and helpfulness of the model's refusal when asked about unavailable data.",
+        evaluation_steps=[
+            "Check if the response provides a clear, direct statement that the requested information is unavailable.",
+            "Verify the response explains WHY the data is unavailable (e.g., column doesn't exist, out of scope).",
+            "Check if the response helpfully suggests what IS available or what alternatives exist.",
+            "Penalize vague refusals like 'I don't know' without explanation. Reward specific, actionable refusals.",
+            "Score 10 if refusal is clear, explains the gap, and suggests alternatives. Score 5 if refusal is clear but unhelpful. Score 0 if no refusal or completely fabricated.",
+        ],
+        evaluation_params=[
+            LLMTestCaseParams.INPUT,
+            LLMTestCaseParams.ACTUAL_OUTPUT,
+            LLMTestCaseParams.EXPECTED_OUTPUT,
+            LLMTestCaseParams.CONTEXT,
+        ],
+        threshold=0.7,
+    )
+
+    return [data_grounding, refusal_quality]
+
+
+def _extract_scores(result) -> dict[str, dict[str, float | None]]:
+    """Extract per-test-case per-metric scores from an EvaluationResult."""
     scores: dict[str, dict[str, float | None]] = {}
     for test_result in result.test_results:
         test_id = test_result.name
         scores[test_id] = {}
         for md in test_result.metrics_data or []:
             scores[test_id][md.name] = md.score
+    return scores
+
+
+def run_evaluation() -> dict[str, dict[str, float | None]]:
+    """
+    Run the full golden dataset through appropriate metrics per category.
+    Standard records get the 4 original metrics; confabulation records get
+    Data Grounding + Refusal Quality.
+    Returns: {test_id: {metric_name: score}}
+    """
+    all_records = load_golden_data()
+    standard_records = [r for r in all_records if r.get("category") != "confabulation"]
+    confab_records = [r for r in all_records if r.get("category") == "confabulation"]
+
+    scores: dict[str, dict[str, float | None]] = {}
+
+    if standard_records:
+        standard_cases = [
+            LLMTestCase(
+                name=r["id"],
+                input=r["input"],
+                actual_output=r["actual_output"],
+                expected_output=r["expected_output"],
+            )
+            for r in standard_records
+        ]
+        result = deepeval.evaluate(
+            test_cases=standard_cases,
+            metrics=_build_metrics(),
+            display_config=DisplayConfig(print_results=False, show_indicator=False),
+            cache_config=CacheConfig(write_cache=False, use_cache=False),
+        )
+        scores.update(_extract_scores(result))
+
+    if confab_records:
+        confab_cases = [
+            LLMTestCase(
+                name=r["id"],
+                input=r["input"],
+                actual_output=r["actual_output"],
+                expected_output=r["expected_output"],
+                context=r.get("context"),
+            )
+            for r in confab_records
+        ]
+        result = deepeval.evaluate(
+            test_cases=confab_cases,
+            metrics=_build_confabulation_metrics(),
+            display_config=DisplayConfig(print_results=False, show_indicator=False),
+            cache_config=CacheConfig(write_cache=False, use_cache=False),
+        )
+        scores.update(_extract_scores(result))
 
     return scores
 
