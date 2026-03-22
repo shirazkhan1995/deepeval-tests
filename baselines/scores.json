@@ -1,0 +1,75 @@
+{
+  "metadata": {
+    "created_at": "2026-03-22T17:53:39.553933+00:00",
+    "deepeval_version": "3.0.0",
+    "test_case_count": 10,
+    "metrics": [
+      "Factual Grounding (GEval)",
+      "Relevance (GEval)",
+      "Completeness (GEval)",
+      "Cosine Similarity"
+    ]
+  },
+  "scores": {
+    "dax-002": {
+      "Factual Grounding (GEval)": 0.9967193931421553,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 1.0,
+      "Cosine Similarity": 0.8247773195335444
+    },
+    "troubleshoot-002": {
+      "Factual Grounding (GEval)": 0.7722237264664028,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 0.7982533517164974,
+      "Cosine Similarity": 0.8975666348461387
+    },
+    "model-002": {
+      "Factual Grounding (GEval)": 0.8672167881713315,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 0.94677549128977,
+      "Cosine Similarity": 0.6998482778268519
+    },
+    "dax-001": {
+      "Factual Grounding (GEval)": 1.0,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 1.0,
+      "Cosine Similarity": 0.8866642595783798
+    },
+    "model-001": {
+      "Factual Grounding (GEval)": 0.9944176857294599,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 1.0,
+      "Cosine Similarity": 0.9186720122691472
+    },
+    "viz-001": {
+      "Factual Grounding (GEval)": 0.9981735724821001,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 1.0,
+      "Cosine Similarity": 0.8920101109408062
+    },
+    "troubleshoot-001": {
+      "Factual Grounding (GEval)": 0.8519167699011302,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 1.0,
+      "Cosine Similarity": 0.7544820129729334
+    },
+    "report-002": {
+      "Factual Grounding (GEval)": 0.8094608137364302,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 0.9931815813633804,
+      "Cosine Similarity": 0.8311785072841454
+    },
+    "report-001": {
+      "Factual Grounding (GEval)": 0.8756277083481174,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 0.6028851642148937,
+      "Cosine Similarity": 0.9305745557490018
+    },
+    "viz-002": {
+      "Factual Grounding (GEval)": 0.9411287251786813,
+      "Relevance (GEval)": 1.0,
+      "Completeness (GEval)": 1.0,
+      "Cosine Similarity": 0.8798166013285647
+    }
+  }
+}
