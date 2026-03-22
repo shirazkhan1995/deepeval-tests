@@ -1,0 +1,10 @@
+{
+  "name": "deepeval-test-suite",
+  "version": "1.0.0",
+  "description": "LLM evaluation test suite using deepeval",
+  "scripts": {
+    "postinstall": "pip install -r requirements.txt",
+    "test": "pytest test_example.py -n auto -v",
+    "test:ci": "pytest test_example.py -n 4 -v --tb=short"
+  }
+}
