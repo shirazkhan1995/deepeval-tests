@@ -1,3 +1,9 @@
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).parent / ".env.development", override=True)
+
 import pytest
 from deepeval import assert_test
 from deepeval.test_case import LLMTestCase, LLMTestCaseParams
