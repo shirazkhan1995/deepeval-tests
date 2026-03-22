@@ -4,7 +4,9 @@
   "description": "LLM evaluation test suite using deepeval",
   "scripts": {
     "postinstall": "pip3 install -r requirements.txt",
-    "test": "pytest test_example.py -n auto -v",
-    "test:ci": "pytest test_example.py -n 4 -v --tb=short"
+    "test": "python3 -m pytest test_semantic_similarity.py test_llm_judge.py -n auto -v",
+    "test:ci": "python3 -m pytest test_semantic_similarity.py test_llm_judge.py -n 4 -v --tb=short",
+    "test:similarity": "python3 -m pytest test_semantic_similarity.py -n auto -v",
+    "test:judge": "python3 -m pytest test_llm_judge.py -n auto -v"
   }
 }

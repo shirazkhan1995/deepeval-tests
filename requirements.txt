@@ -1,4 +1,5 @@
-deepeval==3.9.2
-pytest==9.0.2
+deepeval==3.0.0
+pytest==8.4.2
 pytest-xdist==3.8.0
-python-dotenv==1.0.1
+python-dotenv>=1.1.1
+openai>=1.0.0
